@@ -24,7 +24,8 @@ public class IAEnemyEj : MonoBehaviour
     [SerializeField] float searchTimer;
     [SerializeField] float searchWaitTime = 15;
     [SerializeField] float searchRadius = 30;
-    [SerializeField] float waitTime = 5;
+    [SerializeField] bool patrolWaiting;
+    [SerializeField] float patrolwaitTime = 5;
     [SerializeField] float waitTimer;
 
     void Awake() 
@@ -82,6 +83,10 @@ public class IAEnemyEj : MonoBehaviour
             searchTimer = 0;
             currentState = State.Searching;
         }
+        else
+        {
+            currentState = State.Attacking;
+        }
     }
 
     void Search()
@@ -111,7 +116,7 @@ public class IAEnemyEj : MonoBehaviour
     void Wait()
     {
         waitTimer += Time.deltaTime;
-        if(waitTimer == waitTime)
+        //if(waitTimer == waitTime)
         {
 
         }
@@ -127,7 +132,6 @@ public class IAEnemyEj : MonoBehaviour
         float randomX = Random.Range(-patrolAreaSize.x / 2, patrolAreaSize.x / 2);
         float randomZ = Random.Range(-patrolAreaSize.y / 2, patrolAreaSize.y / 2);
         Vector3 randomPoint = new Vector3(randomX, 0f, randomZ) + patrolAreaCenter[0].position;
-        
 
         enemyAgent.destination = randomPoint;
     }
