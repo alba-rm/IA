@@ -20904,17 +20904,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93f2a480dd0af48449ae83233b5ec4c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patrolAreaCenter:
+  patrolAreaCenter: {fileID: 2088595036}
+  patrolAreaSize: {x: 20, y: 20}
+  areas:
   - {fileID: 2088595036}
   - {fileID: 2093689476}
   - {fileID: 726702816}
   - {fileID: 1018944102}
-  patrolAreaSize: {x: 20, y: 20}
+  patrolArea: 0
   visionRange: 15
   visionAngle: 90
   searchTimer: 0
   searchWaitTime: 15
   searchRadius: 30
+  patrolWaitTime: 5
+  waitTimer: 0
 --- !u!1 &1429550239
 GameObject:
   m_ObjectHideFlags: 0

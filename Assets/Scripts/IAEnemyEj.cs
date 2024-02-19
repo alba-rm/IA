@@ -16,16 +16,19 @@ public class IAEnemyEj : MonoBehaviour
     State currentState;
     UnityEngine.AI.NavMeshAgent enemyAgent;
     Transform playerTransform;
-    [SerializeField] Transform[] patrolAreaCenter;
+    [SerializeField] Transform patrolAreaCenter;
     [SerializeField] Vector2 patrolAreaSize;
+
+    public Transform[] areas;
+    [SerializeField] int patrolArea = 0;
     [SerializeField] float visionRange = 15;
     [SerializeField] float visionAngle = 90;
     Vector3 lastTargetPosition;
     [SerializeField] float searchTimer;
     [SerializeField] float searchWaitTime = 15;
     [SerializeField] float searchRadius = 30;
-    [SerializeField] bool patrolWaiting;
-    [SerializeField] float patrolwaitTime = 5;
+
+    [SerializeField] float patrolWaitTime = 5;
     [SerializeField] float waitTimer;
 
     void Awake() 
@@ -36,6 +39,7 @@ public class IAEnemyEj : MonoBehaviour
     
     void Start()
     {
+        enemyAgent.destination = areas[patrolArea].position;
         currentState = State.Patrolling;
     }
 
@@ -70,7 +74,9 @@ public class IAEnemyEj : MonoBehaviour
         }
         if(enemyAgent.remainingDistance < 0.5f)
         {
-            SetRandomPoint();
+            //SetRandomPoint();
+            currentState = State.Waiting;
+            SetPoint();
         }
     }
 
@@ -80,12 +86,14 @@ public class IAEnemyEj : MonoBehaviour
         if(OnRange() == false)
         {
             //currentState = State.Patrolling;
-            searchTimer = 0;
             currentState = State.Searching;
         }
-        else
+        if(OnRangeAttack() == true)
         {
+            if(enemyAgent.remainingDistance > 0.1f)
+            {//currentState = State.Patrolling;
             currentState = State.Attacking;
+            }
         }
     }
 
@@ -93,6 +101,7 @@ public class IAEnemyEj : MonoBehaviour
     {
         if(OnRange() == true)
         {
+            searchTimer = 0;
             currentState = State.Chasing;
         }
         searchTimer += Time.deltaTime;
@@ -115,26 +124,45 @@ public class IAEnemyEj : MonoBehaviour
 
     void Wait()
     {
-        waitTimer += Time.deltaTime;
-        //if(waitTimer == waitTime)
+        if(enemyAgent.remainingDistance < 0.5f)
         {
+            waitTimer += Time.deltaTime;
+            if(waitTimer >= patrolWaitTime)
+            {
+                waitTimer = 0;
+                currentState = State.Patrolling;
+                
+            }
+        }
 
+        if(OnRange() == true)
+        {
+            currentState = State.Chasing;
         }
     }
 
     void Attack()
     {
         Debug.Log("Atacado!!");
+        currentState = State.Chasing;
     }
-
-    void SetRandomPoint()
+    void SetPoint()
+    {
+        patrolArea ++;
+        if(patrolArea > 3)
+        {
+            patrolArea = 0;
+        }
+        enemyAgent.destination = areas[patrolArea].position;
+    }
+    /*void SetRandomPoint()
     {
         float randomX = Random.Range(-patrolAreaSize.x / 2, patrolAreaSize.x / 2);
         float randomZ = Random.Range(-patrolAreaSize.y / 2, patrolAreaSize.y / 2);
-        Vector3 randomPoint = new Vector3(randomX, 0f, randomZ) + patrolAreaCenter[0].position;
+        Vector3 randomPoint = new Vector3(randomX, 0f, randomZ) + patrolAreaCenter.position;
 
         enemyAgent.destination = randomPoint;
-    }
+    }*/
 
     bool OnRange()
     {
@@ -168,13 +196,40 @@ public class IAEnemyEj : MonoBehaviour
         return false;
     }
 
+    bool OnRangeAttack()
+    {
+       
+        Vector3 directionToPlayer = playerTransform.position - transform.position;
+        float distanceToPlayer = directionToPlayer.magnitude;
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+
+        if(distanceToPlayer <= visionRange && angleToPlayer < visionAngle * 0.1f)
+        {
+            if(playerTransform.position == lastTargetPosition)
+            {
+                lastTargetPosition = playerTransform.position;
+                return true;
+            }
+            //return true;
+            RaycastHit hit;
+            if(Physics.Raycast(transform.position, directionToPlayer, out hit,distanceToPlayer))
+            {
+                if(hit.collider.CompareTag("Player"))
+                {
+                    currentState = State.Attacking;
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
     void OnDrawGizmos() 
     {
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(patrolAreaCenter[0].position, new Vector3(patrolAreaSize.x, 0, patrolAreaSize.y));
-        Gizmos.DrawWireCube(patrolAreaCenter[1].position, new Vector3(patrolAreaSize.x, 0, patrolAreaSize.y));
-        Gizmos.DrawWireCube(patrolAreaCenter[2].position, new Vector3(patrolAreaSize.x, 0, patrolAreaSize.y));
-        Gizmos.DrawWireCube(patrolAreaCenter[3].position, new Vector3(patrolAreaSize.x, 0, patrolAreaSize.y));
+        Gizmos.DrawWireCube(patrolAreaCenter.position, new Vector3(patrolAreaSize.x, 0, patrolAreaSize.y));
+        
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, visionRange);
