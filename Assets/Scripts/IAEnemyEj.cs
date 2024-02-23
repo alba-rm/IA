@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class IAEnemyEj : MonoBehaviour
 {
@@ -30,6 +31,8 @@ public class IAEnemyEj : MonoBehaviour
 
     [SerializeField] float patrolWaitTime = 5;
     [SerializeField] float waitTimer;
+
+    [SerializeField] float attackRange = 1;
 
     void Awake() 
     {
@@ -90,7 +93,7 @@ public class IAEnemyEj : MonoBehaviour
         }
         if(OnRangeAttack() == true)
         {
-            if(enemyAgent.remainingDistance > 0.1f)
+            if(enemyAgent.remainingDistance > 0.5f)
             {//currentState = State.Patrolling;
             currentState = State.Attacking;
             }
@@ -149,7 +152,7 @@ public class IAEnemyEj : MonoBehaviour
     void SetPoint()
     {
         patrolArea ++;
-        if(patrolArea > 3)
+        if(patrolArea > 4)
         {
             patrolArea = 0;
         }
@@ -198,12 +201,11 @@ public class IAEnemyEj : MonoBehaviour
 
     bool OnRangeAttack()
     {
-       
         Vector3 directionToPlayer = playerTransform.position - transform.position;
         float distanceToPlayer = directionToPlayer.magnitude;
         float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
 
-        if(distanceToPlayer <= visionRange && angleToPlayer < visionAngle * 0.1f)
+        if(distanceToPlayer <= attackRange && angleToPlayer < visionAngle * 0.5f)
         {
             if(playerTransform.position == lastTargetPosition)
             {
@@ -216,7 +218,7 @@ public class IAEnemyEj : MonoBehaviour
             {
                 if(hit.collider.CompareTag("Player"))
                 {
-                    currentState = State.Attacking;
+                    
                     return true;
                 }
             }

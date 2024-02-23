@@ -20933,25 +20933,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1412036393}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93f2a480dd0af48449ae83233b5ec4c7, type: 3}
+  m_Script: {fileID: 11500000, guid: 5293c495fbcd50b40af3da65ca76ab74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patrolAreaCenter: {fileID: 2088595036}
-  patrolAreaSize: {x: 10, y: 10}
-  areas:
+  currentState: 0
+  patrolPoints:
   - {fileID: 2088595036}
   - {fileID: 35730158}
   - {fileID: 1383369585}
   - {fileID: 878559203}
   - {fileID: 1674590463}
-  patrolArea: 0
-  visionRange: 15
-  visionAngle: 90
-  searchTimer: 0
-  searchWaitTime: 15
-  searchRadius: 30
-  patrolWaitTime: 5
-  waitTimer: 0
+  detectionRange: 15
+  attackRange: 5
 --- !u!1 &1429550239
 GameObject:
   m_ObjectHideFlags: 0
